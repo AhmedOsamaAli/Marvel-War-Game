@@ -16,40 +16,6 @@ public final class AssetManager {
 
     private static final AssetManager INSTANCE = new AssetManager();
 
-    /** Online portrait URLs indexed by champion name (lowercase). */
-    private static final Map<String, String> ONLINE_URLS = Map.ofEntries(
-        Map.entry("captain america",
-            "https://i.annihil.us/u/prod/marvel/i/mg/3/50/537ba56d31087/portrait_uncanny.jpg"),
-        Map.entry("deadpool",
-            "https://i.annihil.us/u/prod/marvel/i/mg/9/90/5261a86cacb99/portrait_uncanny.jpg"),
-        Map.entry("dr strange",
-            "https://i.annihil.us/u/prod/marvel/i/mg/5/f0/5261a86c5d58b/portrait_uncanny.jpg"),
-        Map.entry("electro",
-            "https://i.annihil.us/u/prod/marvel/i/mg/f/b0/526032b85e949/portrait_uncanny.jpg"),
-        Map.entry("ghost rider",
-            "https://i.annihil.us/u/prod/marvel/i/mg/3/40/526032f7f1f1d/portrait_uncanny.jpg"),
-        Map.entry("hela",
-            "https://i.annihil.us/u/prod/marvel/i/mg/8/70/526032bbf5b0d/portrait_uncanny.jpg"),
-        Map.entry("hulk",
-            "https://i.annihil.us/u/prod/marvel/i/mg/5/a0/538615ca33ab0/portrait_uncanny.jpg"),
-        Map.entry("iceman",
-            "https://i.annihil.us/u/prod/marvel/i/mg/6/b0/526032bcd7938/portrait_uncanny.jpg"),
-        Map.entry("ironman",
-            "https://i.annihil.us/u/prod/marvel/i/mg/9/c0/527bb7b37fd56/portrait_uncanny.jpg"),
-        Map.entry("loki",
-            "https://i.annihil.us/u/prod/marvel/i/mg/d/90/526032c480a0e/portrait_uncanny.jpg"),
-        Map.entry("quicksilver",
-            "https://i.annihil.us/u/prod/marvel/i/mg/b/70/526032c7dfe87/portrait_uncanny.jpg"),
-        Map.entry("spiderman",
-            "https://i.annihil.us/u/prod/marvel/i/mg/3/50/526548a343e4b/portrait_uncanny.jpg"),
-        Map.entry("thor",
-            "https://i.annihil.us/u/prod/marvel/i/mg/d/d0/5269657a74350/portrait_uncanny.jpg"),
-        Map.entry("venom",
-            "https://i.annihil.us/u/prod/marvel/i/mg/4/e0/526032cef042c/portrait_uncanny.jpg"),
-        Map.entry("yellow jacket",
-            "https://i.annihil.us/u/prod/marvel/i/mg/6/e0/526548a0a5a3c/portrait_uncanny.jpg")
-    );
-
     /** Color palette for placeholders when images fail to load (hex strings). */
     private static final Map<String, String> PLACEHOLDER_COLORS = Map.ofEntries(
         Map.entry("captain america", "#1a4b8c"),
@@ -106,20 +72,8 @@ public final class AssetManager {
             } catch (Exception e) { /* try next ext */ }
         }
 
-        // 2. Try online URL with background loading so it never blocks the UI
-        String url = ONLINE_URLS.get(key);
-        if (url != null) {
-            try {
-                // backgroundLoading=true: returns immediately, loads async; ImageViews update automatically
-                Image img = new Image(url, 200, 200, false, true, true);
-                return img;   // may still be loading; isError() will become true if it fails
-            } catch (Exception e) {
-                System.err.println("Could not start portrait load for: " + key);
-            }
-        }
-
-        // 3. Fallback: generate a portrait by painting pixels directly into a WritableImage.
-        // This uses no Canvas / snapshot / rendering pipeline — works everywhere.
+        // 2. Generate a portrait by painting pixels directly into a WritableImage.
+        // This uses no Canvas / snapshot / rendering pipeline — works everywhere including jpackage.
         return generatePixelPortrait(key);
     }
 
