@@ -51,20 +51,14 @@ public final class AssetManager {
     }
 
     private Image loadImage(String key) {
-        // 1. Try bundled resource via the module directly (works in jpackage jlinked image)
+        // ClassLoader.getResourceAsStream bypasses JPMS module encapsulation entirely.
+        // This is the only API guaranteed to work in both gradlew run AND jpackage JIMAGE.
+        // (Class.getResourceAsStream and Module.getResourceAsStream can fail in named
+        //  modules when the resource path maps to a package not declared open.)
+        ClassLoader cl = AssetManager.class.getClassLoader();
         String base = "images/champions/" + key.replace(" ", "_");
         for (String ext : new String[]{".png", ".jpg", ".jpeg"}) {
-            // Use getModule().getResourceAsStream() — the canonical Java 9+ module way;
-            // avoids the getClass().getResourceAsStream("/...") ambiguity in jlinked runtimes.
-            try (InputStream res = AssetManager.class.getModule().getResourceAsStream(base + ext)) {
-                if (res != null) {
-                    byte[] bytes = res.readAllBytes();
-                    return new Image(new java.io.ByteArrayInputStream(bytes));
-                }
-            } catch (Exception e) { /* try next ext */ }
-
-            // Fallback: classic classpath lookup (works during gradlew run and in IDE)
-            try (InputStream res = AssetManager.class.getResourceAsStream("/" + base + ext)) {
+            try (InputStream res = cl.getResourceAsStream(base + ext)) {
                 if (res != null) {
                     byte[] bytes = res.readAllBytes();
                     return new Image(new java.io.ByteArrayInputStream(bytes));
@@ -72,8 +66,7 @@ public final class AssetManager {
             } catch (Exception e) { /* try next ext */ }
         }
 
-        // 2. Generate a portrait by painting pixels directly into a WritableImage.
-        // This uses no Canvas / snapshot / rendering pipeline — works everywhere including jpackage.
+        // Fallback: generate a gradient portrait via PixelWriter (no files, no network needed).
         return generatePixelPortrait(key);
     }
 
@@ -153,15 +146,8 @@ public final class AssetManager {
     public Image getIcon(String name) {
         return cache.computeIfAbsent("icon:" + name, k -> {
             String path = "images/icons/" + name + ".png";
-            // Try module-aware resource lookup first (jpackage jlinked image)
-            try (InputStream res = AssetManager.class.getModule().getResourceAsStream(path)) {
-                if (res != null) {
-                    byte[] bytes = res.readAllBytes();
-                    return new Image(new java.io.ByteArrayInputStream(bytes));
-                }
-            } catch (Exception ignored) {}
-            // Fallback: classpath lookup (gradlew run / IDE)
-            try (InputStream res = AssetManager.class.getResourceAsStream("/" + path)) {
+            ClassLoader cl = AssetManager.class.getClassLoader();
+            try (InputStream res = cl.getResourceAsStream(path)) {
                 if (res == null) return null;
                 byte[] bytes = res.readAllBytes();
                 return new Image(new java.io.ByteArrayInputStream(bytes));
