@@ -4,7 +4,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -56,34 +55,43 @@ public final class AssetManager {
     }
 
     /**
-     * Finds the directory that contains the running exe (jpackage context).
-     * In jpackage, java.class.path contains entries under the app/ directory.
-     * Returns null when running via gradlew / IDE.
+     * Finds the base directory that contains the images/ folder.
+     *
+     * Priority:
+     * 1. System property "marvelwargame.resources" — set by Gradle for dev/run
+     * 2. jpackage: locate app/ directory from java.class.path
+     *
+     * Returns null only if neither is available (should never happen).
      */
-    private static Path detectAppDir() {
+    private static Path detectResourcesDir() {
+        // Dev / gradlew run: Gradle passes -Dmarvelwargame.resources=.../src/main/resources
+        String devProp = System.getProperty("marvelwargame.resources");
+        if (devProp != null) {
+            Path p = Path.of(devProp);
+            if (Files.isDirectory(p)) return p;
+        }
+        // jpackage: images are copied to the app/ dir alongside the JARs
         try {
-            // In jpackage the exe sets jpackage.app-version; confirm we're packaged
-            if (System.getProperty("jpackage.app-version") == null) return null;
-            // java.class.path in jpackage lists the app/-relative jars, e.g.
-            // C:\MarvelWarGame\app\vorbisspi-1.0.3.3.jar
-            String cp = System.getProperty("java.class.path", "");
-            for (String entry : cp.split(java.io.File.pathSeparator)) {
-                Path p = Path.of(entry);
-                if (Files.exists(p)) return p.getParent(); // that's the app/ dir
+            if (System.getProperty("jpackage.app-version") != null) {
+                String cp = System.getProperty("java.class.path", "");
+                for (String entry : cp.split(java.io.File.pathSeparator)) {
+                    Path p = Path.of(entry);
+                    if (Files.exists(p)) return p.getParent();
+                }
             }
         } catch (Exception ignored) {}
         return null;
     }
 
-    private static final Path APP_DIR = detectAppDir();
+    private static final Path RESOURCES_DIR = detectResourcesDir();
 
     private Image loadImage(String key) {
         String base = "images/champions/" + key.replace(" ", "_");
 
-        // 1. Filesystem lookup — works in jpackage where images are copied to app/images/
-        if (APP_DIR != null) {
+        // Load directly from filesystem — bypasses JPMS module encapsulation entirely.
+        if (RESOURCES_DIR != null) {
             for (String ext : new String[]{".png", ".jpg", ".jpeg"}) {
-                Path file = APP_DIR.resolve(base + ext);
+                Path file = RESOURCES_DIR.resolve(base + ext);
                 if (Files.exists(file)) {
                     try { return new Image(file.toUri().toString()); }
                     catch (Exception ignored) {}
@@ -91,18 +99,7 @@ public final class AssetManager {
             }
         }
 
-        // 2. ClassLoader classpath lookup — works in gradlew run / IDE
-        ClassLoader cl = AssetManager.class.getClassLoader();
-        for (String ext : new String[]{".png", ".jpg", ".jpeg"}) {
-            try (InputStream s = cl.getResourceAsStream(base + ext)) {
-                if (s != null) {
-                    byte[] b = s.readAllBytes();
-                    return new Image(new java.io.ByteArrayInputStream(b));
-                }
-            } catch (Exception ignored) {}
-        }
-
-        // 3. Pixel-painted gradient — always works, no files needed
+        // Fallback: pixel-painted gradient — always works, no files needed
         return generatePixelPortrait(key);
     }
 
@@ -114,7 +111,6 @@ public final class AssetManager {
             Color base = Color.web(getPlaceholderColor(key));
             int W = 200, H = 250;
             WritableImage img = new WritableImage(W, H);
-            System.err.println("[AssetManager] generatePixelPortrait key=" + key + " img=" + img + " isError=" + img.isError());
             PixelWriter pw = img.getPixelWriter();
 
             // Pre-compute top/bottom gradient stops
@@ -163,7 +159,6 @@ public final class AssetManager {
 
             return img;
         } catch (Exception e) {
-            System.err.println("[AssetManager] generatePixelPortrait EXCEPTION for " + key + ": " + e);
             return null;
         }
     }
@@ -179,24 +174,18 @@ public final class AssetManager {
         return PLACEHOLDER_COLORS.getOrDefault(championName.toLowerCase(), "#2c3e50");
     }
 
-    /** Load generic icon by name from /images/icons/ resources folder. */
+    /** Load generic icon by name from images/icons/ resources folder. */
     public Image getIcon(String name) {
         return cache.computeIfAbsent("icon:" + name, k -> {
             String path = "images/icons/" + name + ".png";
-            // 1. Filesystem (jpackage)
-            if (APP_DIR != null) {
-                Path file = APP_DIR.resolve(path);
+            if (RESOURCES_DIR != null) {
+                Path file = RESOURCES_DIR.resolve(path);
                 if (Files.exists(file)) {
                     try { return new Image(file.toUri().toString()); }
                     catch (Exception ignored) {}
                 }
             }
-            // 2. ClassLoader classpath (gradlew run / IDE)
-            try (InputStream res = AssetManager.class.getClassLoader().getResourceAsStream(path)) {
-                if (res == null) return null;
-                byte[] bytes = res.readAllBytes();
-                return new Image(new java.io.ByteArrayInputStream(bytes));
-            } catch (Exception e) { return null; }
+            return null;
         });
     }
 }

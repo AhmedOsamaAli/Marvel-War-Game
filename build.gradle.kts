@@ -37,7 +37,8 @@ application {
         "--add-opens", "javafx.graphics/com.sun.javafx.application=ALL-UNNAMED",
         "--add-reads", "com.marvelwargame=ALL-UNNAMED",
         "-Dprism.vsync=false",
-        "-Dprism.dirtyopts=false"
+        "-Dprism.dirtyopts=false",
+        "-Dmarvelwargame.resources=${project.file("src/main/resources").absolutePath}"
     )
 }
 
