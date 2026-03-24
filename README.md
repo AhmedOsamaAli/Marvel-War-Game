@@ -6,11 +6,11 @@ A turn-based tactical battle game featuring 15 Marvel champions built with **Jav
 
 ## Screenshots
 
-| Main Menu | Gameplay — Ability Tooltip |
+| Main Menu | Champion Select |
 |:---------:|:--------------------------:|
 | ![Main Menu](screenshots/main-menu.png) | ![Venom Ability](screenshots/gameplay-venom.png) |
 
-| Gameplay — Ghost Rider's Turn | Champion Select |
+| Gameplay — Ghost Rider's Turn | Gameplay — Ability Tooltip |
 |:-----------------------------:|:---------------:|
 | ![Ghost Rider Turn](screenshots/gameplay-ghost-rider.png) | ![Champion Select](screenshots/champion-select.png) |
 
