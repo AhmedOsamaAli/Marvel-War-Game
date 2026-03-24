@@ -82,13 +82,25 @@ public final class AssetManager {
     }
 
     private Image loadImage(String key) {
-        // 1. Try bundled resource — check both .png and .jpg
-        String base = "/images/champions/" + key.replace(" ", "_");
+        // 1. Try bundled resource via the module directly (works in jpackage jlinked image)
+        String base = "images/champions/" + key.replace(" ", "_");
         for (String ext : new String[]{".png", ".jpg", ".jpeg"}) {
-            InputStream res = getClass().getResourceAsStream(base + ext);
-            if (res != null) {
-                try { return new Image(res); } catch (Exception e) { /* try next ext */ }
-            }
+            // Use getModule().getResourceAsStream() — the canonical Java 9+ module way;
+            // avoids the getClass().getResourceAsStream("/...") ambiguity in jlinked runtimes.
+            try (InputStream res = AssetManager.class.getModule().getResourceAsStream(base + ext)) {
+                if (res != null) {
+                    byte[] bytes = res.readAllBytes();
+                    return new Image(new java.io.ByteArrayInputStream(bytes));
+                }
+            } catch (Exception e) { /* try next ext */ }
+
+            // Fallback: classic classpath lookup (works during gradlew run and in IDE)
+            try (InputStream res = AssetManager.class.getResourceAsStream("/" + base + ext)) {
+                if (res != null) {
+                    byte[] bytes = res.readAllBytes();
+                    return new Image(new java.io.ByteArrayInputStream(bytes));
+                }
+            } catch (Exception e) { /* try next ext */ }
         }
 
         // 2. Try online URL with background loading so it never blocks the UI
@@ -115,9 +127,20 @@ public final class AssetManager {
     /** Load generic icon by name from /images/icons/ resources folder. */
     public Image getIcon(String name) {
         return cache.computeIfAbsent("icon:" + name, k -> {
-            InputStream res = getClass().getResourceAsStream("/images/icons/" + name + ".png");
-            if (res == null) return null;
-            try { return new Image(res); } catch (Exception e) { return null; }
+            String path = "images/icons/" + name + ".png";
+            // Try module-aware resource lookup first (jpackage jlinked image)
+            try (InputStream res = AssetManager.class.getModule().getResourceAsStream(path)) {
+                if (res != null) {
+                    byte[] bytes = res.readAllBytes();
+                    return new Image(new java.io.ByteArrayInputStream(bytes));
+                }
+            } catch (Exception ignored) {}
+            // Fallback: classpath lookup (gradlew run / IDE)
+            try (InputStream res = AssetManager.class.getResourceAsStream("/" + path)) {
+                if (res == null) return null;
+                byte[] bytes = res.readAllBytes();
+                return new Image(new java.io.ByteArrayInputStream(bytes));
+            } catch (Exception e) { return null; }
         });
     }
 }
