@@ -1,0 +1,39 @@
+# Build outputs
+build/
+out/
+*.class
+
+# Gradle wrapper cache
+.gradle/
+gradle/wrapper/gradle-wrapper.jar
+
+# Maven (unused, kept for reference only)
+.mvn/
+mvnw.cmd
+pom.xml
+
+# IDE
+.vscode/
+*.iml
+.idea/
+
+# Logs / debug artifacts
+full_log.txt
+game_stderr.txt
+game_stdout.txt
+run_log.txt
+run_log2.txt
+
+# Raw/unprocessed images dropped during development
+images/
+
+# Raw Kenney asset packs (source packs only — used files are in src/main/resources/)
+kenney_game-icons/
+kenney_game-icons.zip
+kenney_impact-sounds/
+kenney_interface-sounds/
+kenney_ui-pack-rpg-expansion/
+
+# OS junk
+.DS_Store
+Thumbs.db

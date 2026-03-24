@@ -1,0 +1,864 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Marvel War Game — Elite Dark Theme v2.0
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Root Variables ─────────────────────────────────────────────────────── */
+.root {
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -marvel-red:      #ed1d24;
+    -marvel-dark-red: #7a0008;
+    -marvel-gold:     #f5a623;
+    -marvel-dark:     #07070f;
+    -marvel-darker:   #030308;
+    -bg-card:         #0e0e1c;
+    -bg-panel:        #080814;
+    -bg-glass:        rgba(8, 8, 20, 0.88);
+    -text-primary:    #e6e6f0;
+    -text-secondary:  #7878a0;
+    -text-gold:       #f5a623;
+    -border-glow:     #ed1d24;
+    -fx-background-color: #07070f;
+}
+
+/* ── Scene Background ───────────────────────────────────────────────────── */
+.scene-background {
+    -fx-background-color: radial-gradient(center 50% 25%, radius 80%,
+        #120020 0%, #090912 65%, #07070f 100%);
+}
+
+/* ── Typography ─────────────────────────────────────────────────────────── */
+.title-label {
+    -fx-font-size: 52px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -marvel-red;
+    -fx-effect: dropshadow(gaussian, #ed1d24, 22, 0.5, 0, 0),
+                dropshadow(gaussian, #ff5566, 45, 0.15, 0, 0);
+    -fx-letter-spacing: 6px;
+}
+
+.subtitle-label {
+    -fx-font-size: 18px;
+    -fx-text-fill: -text-gold;
+    -fx-letter-spacing: 4px;
+}
+
+.section-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -marvel-gold;
+    -fx-effect: dropshadow(gaussian, #f5a623, 3, 0.2, 0, 0);
+}
+
+.body-text {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-primary;
+}
+
+.dim-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-secondary;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.btn-primary {
+    -fx-background-color: linear-gradient(to bottom, #c01020, #6b0010);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 28 12 28;
+    -fx-background-radius: 3;
+    -fx-border-color: #ed1d24;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-cursor: hand;
+    -fx-letter-spacing: 0.5px;
+    -fx-effect: dropshadow(gaussian, rgba(200,10,20,0.75), 14, 0.45, 0, 2);
+}
+
+.btn-primary:hover {
+    -fx-background-color: linear-gradient(to bottom, #e82030, #900010);
+    -fx-effect: dropshadow(gaussian, #ed1d24, 24, 0.62, 0, 0);
+    -fx-scale-x: 1.025;
+    -fx-scale-y: 1.025;
+}
+
+.btn-primary:pressed {
+    -fx-background-color: linear-gradient(to bottom, #8b0000, #5a0000);
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+.btn-secondary {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-gold;
+    -fx-font-size: 13px;
+    -fx-padding: 8 20 8 20;
+    -fx-border-color: -text-gold;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: rgba(245, 166, 35, 0.1);
+    -fx-effect: dropshadow(gaussian, #f5a623, 6, 0.3, 0, 0);
+}
+
+.btn-icon {
+    -fx-background-color: rgba(237, 29, 36, 0.2);
+    -fx-text-fill: -text-primary;
+    -fx-font-size: 20px;
+    -fx-min-width: 48px;
+    -fx-min-height: 48px;
+    -fx-background-radius: 4;
+    -fx-border-color: rgba(237, 29, 36, 0.5);
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-cursor: hand;
+}
+
+.btn-icon:hover {
+    -fx-background-color: rgba(237, 29, 36, 0.4);
+    -fx-effect: dropshadow(gaussian, #ed1d24, 8, 0.3, 0, 0);
+}
+
+.btn-end-turn {
+    -fx-background-color: linear-gradient(to right, #1a1a2e, #2c2c5e);
+    -fx-text-fill: -text-gold;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 24 10 24;
+    -fx-border-color: -text-gold;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+.btn-end-turn:hover {
+    -fx-background-color: rgba(245, 166, 35, 0.15);
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────────── */
+.champion-card {
+    -fx-background-color: linear-gradient(to bottom, #13132a, #08081a);
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(180,180,220,0.1);
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.85), 14, 0, 0, 4);
+    -fx-cursor: hand;
+}
+
+.champion-card:hover {
+    -fx-border-color: rgba(237,29,36,0.65);
+    -fx-effect: dropshadow(gaussian, rgba(237,29,36,0.55), 22, 0.4, 0, 0);
+    -fx-translate-y: -5;
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+.champion-card.selected {
+    -fx-border-color: -marvel-gold;
+    -fx-border-width: 2.5;
+    -fx-effect: dropshadow(gaussian, #f5a623, 18, 0.5, 0, 0);
+}
+
+.champion-card.leader {
+    -fx-border-color: #ffd700;
+    -fx-border-width: 2.5;
+}
+
+.champion-card.hero-type {
+    -fx-border-color: rgba(30, 130, 200, 0.7);
+}
+
+.champion-card.villain-type {
+    -fx-border-color: rgba(160, 30, 30, 0.7);
+}
+
+.champion-card.antihero-type {
+    -fx-border-color: rgba(120, 60, 180, 0.7);
+}
+
+.card-portrait {
+    -fx-background-radius: 6 6 0 0;
+}
+
+.card-name {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-primary;
+    -fx-text-alignment: center;
+}
+
+.card-type-badge {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 10;
+}
+
+.badge-hero    { -fx-background-color: #1a4b8c; -fx-text-fill: #85c1e9; }
+.badge-villain { -fx-background-color: #7b241c; -fx-text-fill: #f1948a; }
+.badge-antihero{ -fx-background-color: #4a235a; -fx-text-fill: #c39bd3; }
+
+.stat-hp   { -fx-text-fill: #58d68d; }
+.stat-mana { -fx-text-fill: #5dade2; }
+.stat-spd  { -fx-text-fill: #f5cba7; }
+.stat-atk  { -fx-text-fill: #f1948a; }
+
+/* ── HP & Mana Bars ─────────────────────────────────────────────────────── */
+.hp-bar > .bar {
+    -fx-background-color: linear-gradient(to right, #27ae60, #58d68d);
+    -fx-background-insets: 0;
+    -fx-background-radius: 3;
+}
+
+.hp-bar > .track {
+    -fx-background-color: rgba(20, 20, 20, 0.8);
+    -fx-background-radius: 3;
+}
+
+.hp-bar-low > .bar {
+    -fx-background-color: linear-gradient(to right, #c0392b, #e74c3c);
+}
+
+.mana-bar > .bar {
+    -fx-background-color: linear-gradient(to right, #1a5276, #5dade2);
+    -fx-background-insets: 0;
+    -fx-background-radius: 3;
+}
+
+.mana-bar > .track {
+    -fx-background-color: rgba(20, 20, 20, 0.8);
+    -fx-background-radius: 3;
+}
+
+.ap-pip {
+    -fx-background-color: -marvel-gold;
+    -fx-background-radius: 50%;
+    -fx-min-width: 8px;
+    -fx-min-height: 8px;
+    -fx-max-width: 8px;
+    -fx-max-height: 8px;
+}
+
+.ap-pip-empty {
+    -fx-background-color: rgba(200, 200, 200, 0.2);
+    -fx-background-radius: 50%;
+    -fx-min-width: 8px;
+    -fx-min-height: 8px;
+    -fx-max-width: 8px;
+    -fx-max-height: 8px;
+}
+
+/* ── Board ───────────────────────────────────────────────────────────────── */
+.board-grid {
+    -fx-background-color: transparent;
+    -fx-hgap: 4;
+    -fx-vgap: 4;
+    -fx-padding: 8;
+}
+
+.board-cell {
+    -fx-background-color: rgba(8, 10, 24, 0.82);
+    -fx-border-color: rgba(60, 65, 100, 0.30);
+    -fx-border-width: 1;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-min-width: 104px;
+    -fx-min-height: 104px;
+    -fx-max-width: 104px;
+    -fx-max-height: 104px;
+    -fx-alignment: center;
+    -fx-cursor: default;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.55), 6, 0.2, 0, 1);
+}
+
+.board-cell.empty {
+    -fx-background-color: rgba(8, 9, 22, 0.45);
+    -fx-border-color: rgba(50, 55, 85, 0.20);
+}
+
+.board-cell.occupied-p1 {
+    -fx-background-color: rgba(12, 36, 84, 0.72);
+    -fx-border-color: #3a8fe8;
+    -fx-border-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(58,143,232,0.80), 14, 0.50, 0, 0);
+}
+
+.board-cell.occupied-p2 {
+    -fx-background-color: rgba(84, 12, 12, 0.72);
+    -fx-border-color: #e83a3a;
+    -fx-border-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(232,58,58,0.80), 14, 0.50, 0, 0);
+}
+
+.board-cell.cover {
+    -fx-background-color: rgba(55, 42, 28, 0.78);
+    -fx-border-color: rgba(160, 120, 70, 0.70);
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(gaussian, rgba(140,100,50,0.40), 8, 0.3, 0, 0);
+}
+
+.board-cell.current-champion {
+    -fx-border-color: #f5c542;
+    -fx-border-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(245,197,66,1.0), 22, 0.75, 0, 0);
+    -fx-background-color: rgba(20, 16, 6, 0.82);
+}
+
+.board-cell.valid-move {
+    -fx-background-color: rgba(50, 180, 50, 0.25);
+    -fx-border-color: rgba(80, 220, 80, 0.6);
+    -fx-cursor: hand;
+}
+
+.board-cell.valid-attack {
+    -fx-background-color: rgba(220, 50, 50, 0.25);
+    -fx-border-color: rgba(255, 80, 80, 0.6);
+    -fx-cursor: crosshair;
+}
+
+.board-cell.selected-target {
+    -fx-border-color: white;
+    -fx-border-width: 2;
+}
+
+.cell-champion-name {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, black, 3, 0.8, 0, 0);
+}
+
+.cover-label {
+    -fx-font-size: 24px;
+    -fx-text-fill: rgba(200, 160, 100, 0.9);
+}
+
+/* ── Panels ──────────────────────────────────────────────────────────────── */
+.side-panel {
+    -fx-background-color: -bg-panel;
+    -fx-border-color: rgba(237, 29, 36, 0.25);
+    -fx-border-width: 0 1 0 0;
+}
+
+.ability-panel {
+    -fx-background-color: rgba(22, 33, 62, 0.9);
+    -fx-border-color: rgba(237, 29, 36, 0.3);
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 10;
+}
+
+.ability-card {
+    -fx-background-color: rgba(10,10,24,0.92);
+    -fx-background-radius: 5;
+    -fx-border-color: rgba(130,130,175,0.22);
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+    -fx-padding: 8;
+    -fx-cursor: hand;
+    -fx-min-width: 130px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.55), 6, 0, 0, 2);
+}
+
+.ability-card:hover {
+    -fx-border-color: rgba(237,29,36,0.65);
+    -fx-background-color: rgba(18,18,36,0.96);
+    -fx-effect: dropshadow(gaussian, rgba(237,29,36,0.45), 12, 0.28, 0, 0);
+    -fx-translate-y: -1;
+}
+
+.ability-card.on-cooldown {
+    -fx-opacity: 0.5;
+    -fx-cursor: default;
+}
+
+.ability-card.selected {
+    -fx-border-color: -marvel-gold;
+    -fx-effect: dropshadow(gaussian, #f5a623, 8, 0.4, 0, 0);
+}
+
+.ability-name {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e8e8f8;
+    -fx-wrap-text: true;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 3, 0.5, 0, 1);
+}
+
+.ability-cost {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #85c1e9;
+}
+
+.ability-cooldown {
+    -fx-font-size: 9px;
+    -fx-text-fill: #e74c3c;
+    -fx-font-weight: bold;
+}
+
+.ability-type-dmg {
+    -fx-text-fill: #ff6b6b;
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-background-color: rgba(200,50,50,0.22);
+    -fx-padding: 1 4 1 4;
+    -fx-background-radius: 3;
+}
+.ability-type-hel {
+    -fx-text-fill: #58d68d;
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-background-color: rgba(40,160,80,0.22);
+    -fx-padding: 1 4 1 4;
+    -fx-background-radius: 3;
+}
+.ability-type-cc {
+    -fx-text-fill: #c39bd3;
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-background-color: rgba(140,60,180,0.22);
+    -fx-padding: 1 4 1 4;
+    -fx-background-radius: 3;
+}
+
+/* ── Effect Badges ──────────────────────────────────────────────────────── */
+.effect-badge {
+    -fx-font-size: 9px;
+    -fx-padding: 2 6 2 6;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 4, 0.3, 0, 1);
+    -fx-cursor: hand;
+}
+
+.effect-buff {
+    -fx-background-color: linear-gradient(to right, rgba(20,100,60,0.90), rgba(40,140,80,0.90));
+    -fx-text-fill: #abebc6;
+    -fx-border-color: rgba(88,214,141,0.5);
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+.effect-debuff {
+    -fx-background-color: linear-gradient(to right, rgba(100,20,20,0.90), rgba(160,40,40,0.90));
+    -fx-text-fill: #f1948a;
+    -fx-border-color: rgba(231,76,60,0.5);
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+/* ── Log Pane ────────────────────────────────────────────────────────────── */
+.log-pane {
+    -fx-background-color: rgba(2,2,10,0.98);
+    -fx-border-color: rgba(237,29,36,0.18);
+    -fx-border-width: 1 0 0 0;
+}
+
+.log-text-area {
+    -fx-control-inner-background: rgba(2,2,10,0.98);
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(155,175,210,0.85);
+    -fx-font-size: 11px;
+    -fx-font-family: "Consolas", "Courier New", monospace;
+    -fx-highlight-fill: rgba(237,29,36,0.3);
+}
+
+.log-text-area .scroll-pane {
+    -fx-background-color: transparent;
+}
+.log-text-area .scroll-bar { -fx-opacity: 0.4; }
+
+/* ── TextField ───────────────────────────────────────────────────────────── */
+.text-field-dark {
+    -fx-background-color: rgba(30, 30, 50, 0.9);
+    -fx-text-fill: -text-primary;
+    -fx-prompt-text-fill: rgba(150, 150, 170, 0.6);
+    -fx-border-color: rgba(237, 29, 36, 0.5);
+    -fx-border-width: 0 0 2 0;
+    -fx-background-radius: 4;
+    -fx-padding: 10 14 10 14;
+    -fx-font-size: 14px;
+}
+
+.text-field-dark:focused {
+    -fx-border-color: -marvel-red;
+    -fx-effect: dropshadow(gaussian, #ed1d24, 6, 0.3, 0, 0);
+}
+
+/* ── Separator ───────────────────────────────────────────────────────────── */
+.separator {
+    -fx-background-color: rgba(237, 29, 36, 0.3);
+}
+
+/* ── ScrollBar ───────────────────────────────────────────────────────────── */
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: rgba(237, 29, 36, 0.4);
+    -fx-background-radius: 4;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: rgba(237, 29, 36, 0.7);
+}
+
+.scroll-bar .track {
+    -fx-background-color: rgba(10, 10, 20, 0.5);
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 2;
+}
+
+/* ── Game-Over Overlay ───────────────────────────────────────────────────── */
+.game-over-overlay {
+    -fx-background-color: rgba(5, 5, 10, 0.85);
+}
+
+.game-over-title {
+    -fx-font-size: 64px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -marvel-gold;
+    -fx-effect: dropshadow(gaussian, #f5a623, 25, 0.6, 0, 0);
+}
+
+.game-over-winner {
+    -fx-font-size: 28px;
+    -fx-text-fill: -marvel-gold;
+    -fx-effect: dropshadow(gaussian, #f5a623, 10, 0.35, 0, 0);
+}
+
+/* ── Misc ─────────────────────────────────────────────────────────────────── */
+.divider-line {
+    -fx-background-color: rgba(237, 29, 36, 0.3);
+    -fx-min-height: 1px;
+    -fx-max-height: 1px;
+}
+
+.tooltip-dark {
+    -fx-background-color: rgba(10, 10, 25, 0.95);
+    -fx-text-fill: -text-primary;
+    -fx-border-color: rgba(237, 29, 36, 0.5);
+    -fx-border-width: 1;
+    -fx-font-size: 12px;
+}
+
+.player1-color { -fx-text-fill: #5dade2; }
+.player2-color { -fx-text-fill: #ff7070; }
+
+.turn-indicator {
+    -fx-background-color: linear-gradient(to right, rgba(237,29,36,0.3), transparent);
+    -fx-padding: 6 16 6 16;
+    -fx-background-radius: 4;
+}
+
+.condition-active   { -fx-text-fill: #58d68d; }
+.condition-rooted   { -fx-text-fill: #f0b27a; }
+.condition-inactive { -fx-text-fill: #e74c3c; }
+.condition-ko       { -fx-text-fill: rgba(150, 150, 150, 0.5); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   Marvel War Game v2.0 — Additions
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── Action Tab Strip ───────────────────────────────────────────────────── */
+.action-tab-strip {
+    -fx-background-color: rgba(4,4,14,0.95);
+    -fx-background-radius: 4;
+    -fx-border-color: rgba(237,29,36,0.45);
+    -fx-border-radius: 4;
+    -fx-border-width: 1;
+    -fx-padding: 0;
+}
+.action-tab {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(150,150,175,0.65);
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-padding: 7 10;
+    -fx-background-radius: 0;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-min-width: 56px;
+    -fx-letter-spacing: 1px;
+}
+.action-tab:hover:!selected {
+    -fx-background-color: rgba(237,29,36,0.1);
+    -fx-text-fill: #c0c0d8;
+}
+.action-tab:selected {
+    -fx-background-color: rgba(237,29,36,0.25);
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(237,29,36,0.5), 6, 0.3, 0, 0);
+}
+
+/* ── Filter Tab Strip (Champion Select) ─────────────────────────────────── */
+.filter-tab-strip {
+    -fx-background-color: rgba(4,4,16,0.98);
+    -fx-border-color: rgba(237,29,36,0.2);
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 0 30 0 30;
+}
+.filter-tab {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(150,150,180,0.6);
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 9 22 9 22;
+    -fx-background-radius: 0;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 2 0;
+    -fx-letter-spacing: 1.5px;
+}
+.filter-tab:hover:!selected {
+    -fx-text-fill: #c0c0d8;
+    -fx-border-color: rgba(245,166,35,0.35);
+}
+.filter-tab:selected {
+    -fx-text-fill: -text-gold;
+    -fx-border-color: -text-gold;
+    -fx-effect: dropshadow(gaussian, rgba(245,166,35,0.4), 4, 0.2, 0, 1);
+}
+
+/* ── Board Highlight Cells ──────────────────────────────────────────────── */
+.board-cell.highlight-move {
+    -fx-background-color: rgba(25,155,25,0.25);
+    -fx-border-color: rgba(50,210,50,0.7);
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(gaussian, rgba(50,210,50,0.55), 9, 0.4, 0, 0);
+    -fx-cursor: hand;
+}
+.board-cell.highlight-attack {
+    -fx-background-color: rgba(195,25,25,0.22);
+    -fx-border-color: rgba(255,65,65,0.72);
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(gaussian, rgba(255,65,65,0.55), 9, 0.4, 0, 0);
+    -fx-cursor: crosshair;
+}
+.board-cell.highlight-ability {
+    -fx-background-color: rgba(120,25,175,0.24);
+    -fx-border-color: rgba(170,70,235,0.72);
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(gaussian, rgba(170,70,235,0.55), 9, 0.4, 0, 0);
+    -fx-cursor: crosshair;
+}
+
+/* ── Turn Announcement Banner ───────────────────────────────────────────── */
+.turn-banner-pane {
+    -fx-background-color: rgba(4,4,18,0.86);
+    -fx-border-color: rgba(245,166,35,0.45);
+    -fx-border-width: 1 0 1 0;
+    -fx-padding: 8 0;
+}
+.turn-banner-text {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 4px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.95), 8, 0.85, 0, 0);
+}
+.turn-banner-sub {
+    -fx-font-size: 10px;
+    -fx-text-fill: rgba(190,190,215,0.75);
+    -fx-letter-spacing: 3px;
+}
+
+/* ── Floating Damage / Heal Numbers ────────────────────────────────────── */
+.floating-dmg {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ff5050;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.95), 5, 0.9, 0, 0);
+    -fx-mouse-transparent: true;
+}
+.floating-heal {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #55ee88;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.95), 5, 0.9, 0, 0);
+    -fx-mouse-transparent: true;
+}
+
+/* ── Top Bar Mute Button ────────────────────────────────────────────────── */
+.btn-mute {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(160,160,190,0.6);
+    -fx-font-size: 14px;
+    -fx-min-width: 28px;
+    -fx-min-height: 28px;
+    -fx-max-width: 28px;
+    -fx-max-height: 28px;
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(160,160,190,0.25);
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+.btn-mute:hover {
+    -fx-background-color: rgba(237,29,36,0.15);
+    -fx-border-color: rgba(237,29,36,0.5);
+    -fx-text-fill: white;
+}
+.btn-mute:selected {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(100,100,130,0.5);
+    -fx-border-color: rgba(100,100,130,0.2);
+}
+/* ════════════════════════════════════════════════════════════════════════
+   Marvel War Game v2.0 — Additions
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── Action Tab Strip ───────────────────────────────────────────────────── */
+.action-tab-strip {
+    -fx-background-color: rgba(4,4,14,0.95);
+    -fx-background-radius: 4;
+    -fx-border-color: rgba(237,29,36,0.45);
+    -fx-border-radius: 4;
+    -fx-border-width: 1;
+    -fx-padding: 0;
+}
+.action-tab {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(150,150,175,0.65);
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-padding: 7 10;
+    -fx-background-radius: 0;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-min-width: 56px;
+    -fx-letter-spacing: 1px;
+}
+.action-tab:hover:!selected {
+    -fx-background-color: rgba(237,29,36,0.1);
+    -fx-text-fill: #c0c0d8;
+}
+.action-tab:selected {
+    -fx-background-color: rgba(237,29,36,0.25);
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(237,29,36,0.5), 6, 0.3, 0, 0);
+}
+
+/* ── Filter Tab Strip (Champion Select) ─────────────────────────────────── */
+.filter-tab-strip {
+    -fx-background-color: rgba(4,4,16,0.98);
+    -fx-border-color: rgba(237,29,36,0.2);
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 0 30 0 30;
+}
+.filter-tab {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(150,150,180,0.6);
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 9 22 9 22;
+    -fx-background-radius: 0;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 2 0;
+    -fx-letter-spacing: 1.5px;
+}
+.filter-tab:hover:!selected {
+    -fx-text-fill: #c0c0d8;
+    -fx-border-color: rgba(245,166,35,0.35);
+}
+.filter-tab:selected {
+    -fx-text-fill: -text-gold;
+    -fx-border-color: -text-gold;
+    -fx-effect: dropshadow(gaussian, rgba(245,166,35,0.4), 4, 0.2, 0, 1);
+}
+
+/* ── Board Highlight Cells ──────────────────────────────────────────────── */
+.board-cell.highlight-move {
+    -fx-background-color: rgba(25,155,25,0.25);
+    -fx-border-color: rgba(50,210,50,0.7);
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(gaussian, rgba(50,210,50,0.55), 9, 0.4, 0, 0);
+    -fx-cursor: hand;
+}
+.board-cell.highlight-attack {
+    -fx-background-color: rgba(195,25,25,0.22);
+    -fx-border-color: rgba(255,65,65,0.72);
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(gaussian, rgba(255,65,65,0.55), 9, 0.4, 0, 0);
+    -fx-cursor: crosshair;
+}
+.board-cell.highlight-ability {
+    -fx-background-color: rgba(120,25,175,0.24);
+    -fx-border-color: rgba(170,70,235,0.72);
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(gaussian, rgba(170,70,235,0.55), 9, 0.4, 0, 0);
+    -fx-cursor: crosshair;
+}
+
+/* ── Turn Announcement Banner ───────────────────────────────────────────── */
+.turn-banner-pane {
+    -fx-background-color: rgba(4,4,18,0.86);
+    -fx-border-color: rgba(245,166,35,0.45);
+    -fx-border-width: 1 0 1 0;
+    -fx-padding: 8 0;
+}
+.turn-banner-text {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 4px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.95), 8, 0.85, 0, 0);
+}
+.turn-banner-sub {
+    -fx-font-size: 10px;
+    -fx-text-fill: rgba(190,190,215,0.75);
+    -fx-letter-spacing: 3px;
+}
+
+/* ── Floating Damage / Heal Numbers ────────────────────────────────────── */
+.floating-dmg {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ff5050;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.95), 5, 0.9, 0, 0);
+    -fx-mouse-transparent: true;
+}
+.floating-heal {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #55ee88;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.95), 5, 0.9, 0, 0);
+    -fx-mouse-transparent: true;
+}
+
+/* ── Top Bar Mute Button ────────────────────────────────────────────────── */
+.btn-mute {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(160,160,190,0.6);
+    -fx-font-size: 14px;
+    -fx-min-width: 28px;
+    -fx-min-height: 28px;
+    -fx-max-width: 28px;
+    -fx-max-height: 28px;
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(160,160,190,0.25);
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+.btn-mute:hover {
+    -fx-background-color: rgba(237,29,36,0.15);
+    -fx-border-color: rgba(237,29,36,0.5);
+    -fx-text-fill: white;
+}
+.btn-mute:selected {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(100,100,130,0.5);
+    -fx-border-color: rgba(100,100,130,0.2);
+}

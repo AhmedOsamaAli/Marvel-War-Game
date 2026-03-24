@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.marvelwargame.ui.controllers.PlayerSetupController"
+           styleClass="scene-background"
+           stylesheets="@../css/marvel-theme.css"
+           prefWidth="700" prefHeight="480">
+
+    <VBox alignment="CENTER" spacing="36">
+        <Label text="ENTER PLAYER NAMES" styleClass="title-label"
+               style="-fx-font-size: 34px;"/>
+
+        <HBox spacing="60" alignment="CENTER">
+            <!-- Player 1 -->
+            <VBox spacing="12" alignment="CENTER">
+                <Label text="PLAYER 1" styleClass="subtitle-label"
+                       style="-fx-text-fill: #5dade2;"/>
+                <TextField fx:id="tfPlayer1" promptText="Enter name..."
+                           styleClass="text-field-dark" prefWidth="240"
+                           text="Player 1"/>
+            </VBox>
+
+            <Label text="VS" styleClass="title-label"
+                   style="-fx-font-size: 36px; -fx-text-fill: rgba(255,255,255,0.3);"/>
+
+            <!-- Player 2 -->
+            <VBox spacing="12" alignment="CENTER">
+                <Label text="PLAYER 2" styleClass="subtitle-label"
+                       style="-fx-text-fill: #e74c3c;"/>
+                <TextField fx:id="tfPlayer2" promptText="Enter name..."
+                           styleClass="text-field-dark" prefWidth="240"
+                           text="Player 2"/>
+            </VBox>
+        </HBox>
+
+        <HBox spacing="16" alignment="CENTER">
+            <Button text="◀  BACK" styleClass="btn-secondary" prefWidth="140"
+                    onAction="#onBack"/>
+            <Button text="NEXT  ▶" styleClass="btn-primary" prefWidth="180"
+                    onAction="#onNext"/>
+        </HBox>
+    </VBox>
+</StackPane>

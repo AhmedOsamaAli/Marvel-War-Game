@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.marvelwargame.ui.controllers.ChampionSelectController"
+            styleClass="scene-background"
+            stylesheets="@../css/marvel-theme.css"
+            prefWidth="1200" prefHeight="780">
+
+    <!-- Top Header -->
+    <top>
+        <VBox style="-fx-padding: 18 30 0 30; -fx-spacing: 4;">
+            <HBox alignment="CENTER_LEFT" spacing="16">
+                <Label text="CHOOSE YOUR CHAMPIONS" styleClass="title-label"
+                       style="-fx-font-size: 26px;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblP1Progress" text="P1: 0/3"
+                       styleClass="body-text player1-color" style="-fx-font-weight: bold;"/>
+                <Label text="  |  " styleClass="dim-text"/>
+                <Label fx:id="lblP2Progress" text="P2: 0/3"
+                       styleClass="body-text player2-color" style="-fx-font-weight: bold;"/>
+            </HBox>
+            <Label fx:id="lblInstruction" styleClass="subtitle-label"
+                   text="Player 1 — Select 3 Champions"/>
+        </VBox>
+    </top>
+
+    <!-- Center - Filter tabs + Champion Grid + Profile Panel -->
+    <center>
+        <HBox>
+            <!-- Left: filter tabs + champion grid -->
+            <VBox HBox.hgrow="ALWAYS">
+                <!-- Filter tab strip -->
+                <HBox fx:id="filterTabBox" styleClass="filter-tab-strip" spacing="0">
+                    <fx:define><ToggleGroup fx:id="filterGroup"/></fx:define>
+                    <ToggleButton fx:id="tbFilterAll"       text="ALL"        styleClass="filter-tab"
+                                  selected="true" toggleGroup="$filterGroup" onAction="#onFilterAll"/>
+                    <ToggleButton fx:id="tbFilterHeroes"    text="HEROES"     styleClass="filter-tab"
+                                  toggleGroup="$filterGroup" onAction="#onFilterHeroes"/>
+                    <ToggleButton fx:id="tbFilterVillains"  text="VILLAINS"   styleClass="filter-tab"
+                                  toggleGroup="$filterGroup" onAction="#onFilterVillains"/>
+                    <ToggleButton fx:id="tbFilterAntiHeroes" text="ANTI-HEROES" styleClass="filter-tab"
+                                  toggleGroup="$filterGroup" onAction="#onFilterAntiHeroes"/>
+                </HBox>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS"
+                            style="-fx-background-color: transparent; -fx-background: transparent;">
+                    <FlowPane fx:id="championGrid" hgap="16" vgap="16"
+                              style="-fx-padding: 16 28 16 28; -fx-background-color: transparent;"
+                              prefWrapLength="870"/>
+                </ScrollPane>
+            </VBox>
+
+            <!-- Right: Champion profile panel -->
+            <ScrollPane fx:id="profileScroll" prefWidth="295" minWidth="295" maxWidth="295"
+                        hbarPolicy="NEVER" fitToWidth="true"
+                        style="-fx-background-color: rgba(4,4,20,0.97); -fx-background: rgba(4,4,20,0.97);
+                               -fx-border-color: rgba(237,29,36,0.18); -fx-border-width: 0 0 0 1;">
+                <VBox fx:id="profilePanel">
+                    <Label text="Hover a champion to view profile"
+                           style="-fx-font-size: 12px; -fx-text-fill: rgba(180,180,200,0.3);
+                                  -fx-padding: 40 20 20 20; -fx-wrap-text: true; -fx-text-alignment: center;"
+                           maxWidth="295"/>
+                </VBox>
+            </ScrollPane>
+        </HBox>
+    </center>
+
+    <!-- Bottom - Player info + action -->
+    <bottom>
+        <HBox style="-fx-background-color: rgba(4,4,16,0.96);
+                     -fx-padding: 14 30 14 30;
+                     -fx-border-color: rgba(237,29,36,0.25); -fx-border-width: 1 0 0 0;"
+              alignment="CENTER_LEFT" spacing="24">
+
+            <!-- Slot display -->
+            <VBox spacing="6" HBox.hgrow="ALWAYS">
+                <Label fx:id="lblCurrentPlayer" text="PLAYER 1 SELECTION"
+                       styleClass="section-title" style="-fx-font-size: 13px;"/>
+                <HBox fx:id="selectedChampionsBox" spacing="8"/>
+            </VBox>
+
+            <!-- Leader hint -->
+            <VBox spacing="3" alignment="CENTER" minWidth="140">
+                <Label text="★ FIRST PICK = LEADER" styleClass="dim-text"
+                       style="-fx-text-fill: gold; -fx-font-size: 10px; -fx-letter-spacing: 1px;"/>
+                <Label fx:id="lblLeaderHint" text="Click any selected card to change"
+                       styleClass="dim-text" wrapText="true" style="-fx-text-alignment: center;"/>
+            </VBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Nav buttons -->
+            <HBox spacing="12" alignment="CENTER_RIGHT">
+                <Button fx:id="btnBack" text="◀  BACK"
+                        styleClass="btn-secondary" prefWidth="120"
+                        onAction="#onBack"/>
+                <Button fx:id="btnConfirm" text="CONFIRM  ▶"
+                        styleClass="btn-primary" prefWidth="170"
+                        onAction="#onConfirm" disable="true"/>
+            </HBox>
+        </HBox>
+    </bottom>
+
+</BorderPane>

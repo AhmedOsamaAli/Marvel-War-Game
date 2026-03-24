@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.marvelwargame.ui.controllers.MainMenuController"
+           styleClass="scene-background"
+           stylesheets="@../css/marvel-theme.css"
+           prefWidth="1100" prefHeight="680">
+
+    <!-- Animated background particles layer (populated programmatically) -->
+    <Pane fx:id="particleLayer" mouseTransparent="true"
+          prefWidth="1100" prefHeight="680" opacity="0.4"/>
+
+    <!-- Main content -->
+    <VBox alignment="CENTER" spacing="0">
+
+        <!-- Logo / Title area -->
+        <VBox alignment="CENTER" spacing="10" style="-fx-padding: 0 0 40 0;">
+            <Label text="MARVEL" styleClass="title-label"
+                   style="-fx-font-size: 80px; -fx-letter-spacing: 20px;"/>
+            <Label text="WAR  GAME" styleClass="title-label"
+                   style="-fx-font-size: 56px; -fx-letter-spacing: 12px; -fx-text-fill: white;"/>
+            <Label text="TACTICAL CHAMPION BATTLES" styleClass="subtitle-label"/>
+        </VBox>
+
+        <!-- Divider -->
+        <Region styleClass="divider-line" prefWidth="400" maxWidth="400"
+                style="-fx-background-color: rgba(237,29,36,0.6); -fx-min-height: 2px; -fx-max-height: 2px;"/>
+
+        <Region prefHeight="40"/>
+
+        <!-- Menu Buttons -->
+        <VBox alignment="CENTER" spacing="14" maxWidth="320">
+            <Button fx:id="btnNewGame" text="⚔  NEW GAME"
+                    styleClass="btn-primary" maxWidth="280" prefWidth="280"
+                    onAction="#onNewGame"/>
+            <Button fx:id="btnHowToPlay" text="📖  HOW TO PLAY"
+                    styleClass="btn-secondary" maxWidth="280" prefWidth="280"
+                    onAction="#onHowToPlay"/>
+            <Button fx:id="btnQuit" text="✕  QUIT"
+                    styleClass="btn-secondary" maxWidth="280" prefWidth="280"
+                    onAction="#onQuit"/>
+        </VBox>
+
+        <Region prefHeight="50"/>
+
+        <!-- Footer -->
+        <Label text="15 Champions • Tactical 5×5 Grid • Turn-Based Strategy"
+               styleClass="dim-text"/>
+    </VBox>
+
+    <!-- How To Play overlay -->
+    <StackPane fx:id="howToPlayOverlay" visible="false"
+               style="-fx-background-color: rgba(5,5,10,0.92);">
+        <VBox alignment="CENTER" spacing="16" maxWidth="600"
+              style="-fx-background-color: #1a1a2e; -fx-background-radius: 12;
+                     -fx-border-color: rgba(237,29,36,0.5); -fx-border-width: 1;
+                     -fx-border-radius: 12; -fx-padding: 40;">
+            <Label text="HOW TO PLAY" styleClass="section-title"
+                   style="-fx-font-size: 26px;"/>
+            <Label wrapText="true" styleClass="body-text"
+                   text="Each player selects 3 Champions and designates one as their Leader.
+Champions take turns based on Speed — fastest acts first.
+
+ACTIONS PER TURN:
+  • Move (1 AP) — Navigate the 5×5 grid
+  • Attack (2 AP) — Attack in a direction using attack range
+  • Cast Ability (variable AP + Mana)
+  • Leader Ability (once per game, only when it's the leader's turn)
+
+TYPE ADVANTAGE:
+  • Hero vs. Villain (and vice versa) deals 1.5× damage
+  • AntiHeroes deal normal damage to all types
+
+EFFECTS:
+  Buffs: Shield, Dodge, PowerUp, SpeedUp, Embrace
+  Debuffs: Stun, Root, Silence, Disarm, Shock
+
+WIN CONDITION: Knock out all of the opponent's champions!"/>
+            <Button text="CLOSE" styleClass="btn-primary"
+                    onAction="#onCloseHowToPlay" prefWidth="160"/>
+        </VBox>
+    </StackPane>
+
+</StackPane>
