@@ -96,7 +96,9 @@ tasks.register("jpackageImage") {
                 "--input",       inputDir.absolutePath,
                 "--java-options","--enable-native-access=javafx.graphics",
                 "--java-options","--add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED",
-                "--java-options","--add-reads=com.marvelwargame=ALL-UNNAMED"
+                "--java-options","--add-reads=com.marvelwargame=ALL-UNNAMED",
+                "--java-options","-Dprism.vsync=false",
+                "--java-options","-Dprism.dirtyopts=false"
             )
         }
 
