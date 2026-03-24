@@ -862,3 +862,50 @@
     -fx-text-fill: rgba(100,100,130,0.5);
     -fx-border-color: rgba(100,100,130,0.2);
 }
+
+/* ── Ability UX Additions ───────────────────────────────────────────────── */
+
+/* Self-target highlight (cyan) */
+.board-cell.highlight-self {
+    -fx-background-color: rgba(25,200,200,0.28);
+    -fx-border-color: rgba(0,230,230,0.80);
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(0,230,230,0.65), 12, 0.45, 0, 0);
+    -fx-cursor: default;
+}
+/* Team-target highlight (teal) */
+.board-cell.highlight-team {
+    -fx-background-color: rgba(25,170,120,0.26);
+    -fx-border-color: rgba(50,220,160,0.78);
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(gaussian, rgba(50,220,160,0.55), 9, 0.4, 0, 0);
+    -fx-cursor: default;
+}
+/* Dimmed cells — not a valid target for this ability */
+/* Dimmed cells — dark overlay instead of opacity to avoid D3D texture pressure */
+.board-cell.cell-dimmed {
+    -fx-background-color: rgba(0, 0, 0, 0.62);
+    -fx-cursor: default;
+}
+
+/* Cast Now button */
+.btn-cast-now {
+    -fx-background-color: linear-gradient(to bottom, #7b2fbe, #3d1060);
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 18 10 18;
+    -fx-background-radius: 4;
+    -fx-border-color: rgba(170,70,235,0.85);
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(150,50,220,0.65), 12, 0.4, 0, 2);
+}
+.btn-cast-now:hover {
+    -fx-background-color: linear-gradient(to bottom, #9b3fde, #5a1890);
+    -fx-effect: dropshadow(gaussian, rgba(170,70,235,0.90), 18, 0.55, 0, 0);
+}
+.btn-cast-now:pressed {
+    -fx-background-color: linear-gradient(to bottom, #5a1890, #7b2fbe);
+}

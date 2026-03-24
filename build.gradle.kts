@@ -35,7 +35,9 @@ application {
     applicationDefaultJvmArgs = listOf(
         "--enable-native-access=javafx.graphics",
         "--add-opens", "javafx.graphics/com.sun.javafx.application=ALL-UNNAMED",
-        "--add-reads", "com.marvelwargame=ALL-UNNAMED"
+        "--add-reads", "com.marvelwargame=ALL-UNNAMED",
+        "-Dprism.vsync=false",
+        "-Dprism.dirtyopts=false"
     )
 }
 

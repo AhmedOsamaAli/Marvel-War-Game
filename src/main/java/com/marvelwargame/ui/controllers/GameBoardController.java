@@ -60,6 +60,7 @@ public class GameBoardController {
 
     // Right panel - abilities
     @FXML private VBox abilitiesBox;
+    @FXML private Button btnCastNow;
 
     // Bottom log
     @FXML private TextArea gameLog;
@@ -68,6 +69,7 @@ public class GameBoardController {
     private Game game;
     private int turnNumber = 1;
     private Ability selectedAbility = null;
+    private Ability expandedAbility = null;  // which card's detail panel is open
     private StackPane[][] cells;
     private final Map<Champion, Integer> hpSnapshot = new HashMap<>();
 
@@ -582,26 +584,90 @@ public class GameBoardController {
             noL.setStyle("-fx-font-size: 8px; -fx-text-fill: #e74c3c;");
             costRow.getChildren().add(noL);
         } else {
-            Label readyL = new Label("\u2705 Ready");
+            Label readyL = new Label("\u2705 Ready \u2014 click to select");
             readyL.setStyle("-fx-font-size: 8px; -fx-text-fill: #58d68d;");
             costRow.getChildren().add(readyL);
         }
 
-        card.getChildren().addAll(topRow, nameL, costRow);
+        // ── Inline detail panel (shown on click instead of hover tooltip) ──────
+        VBox detailBox = new VBox(3);
+        boolean isExpanded = (a == expandedAbility);
+        detailBox.setVisible(isExpanded);
+        detailBox.setManaged(isExpanded);
+        detailBox.setStyle("-fx-padding: 4 0 0 0;");
 
-        if (ready) {
-            card.setOnMouseClicked(e -> {
-                SoundManager.getInstance().play("select");
-                selectedAbility = (selectedAbility == a) ? null : a;
-                tbCast.setSelected(true);
-                refreshAbilitiesPanel();
-                highlightCells();
-            });
+        Separator sep = new Separator();
+        sep.setStyle("-fx-opacity: 0.25;");
+
+        Label whatL;
+        if (a instanceof DamagingAbility da) {
+            whatL = new Label("\u2694 Deals " + da.getDamageAmount() + " damage");
+            whatL.setStyle("-fx-font-size: 9px; -fx-text-fill: #ff9999;");
+        } else if (a instanceof HealingAbility ha) {
+            whatL = new Label("\u2764 Heals " + ha.getHealAmount() + " HP");
+            whatL.setStyle("-fx-font-size: 9px; -fx-text-fill: #7fdf9f;");
+        } else if (a instanceof CrowdControlAbility cc) {
+            whatL = new Label("\uD83D\uDD17 Applies: " + cc.getEffect().getName());
+            whatL.setStyle("-fx-font-size: 9px; -fx-text-fill: #c39bd3;");
+        } else {
+            whatL = new Label("Special ability");
+            whatL.setStyle("-fx-font-size: 9px; -fx-text-fill: #c8c8e8;");
         }
-        Tooltip tt = new Tooltip(buildAbilityTooltip(a));
-        tt.setStyle("-fx-background-color: #070715; -fx-text-fill: white; "
-                + "-fx-border-color: #ed1d24; -fx-border-width: 1; -fx-font-size: 11px;");
-        Tooltip.install(card, tt);
+        whatL.setWrapText(true);
+        whatL.setMaxWidth(190);
+
+        String aimDesc = switch (a.getCastArea().toString()) {
+            case "SINGLETARGET" -> "\uD83C\uDFAF Click a highlighted enemy cell";
+            case "DIRECTIONAL"  -> "\u2B06 Press a direction \u2014 fires a line";
+            case "SURROUND"     -> "\uD83D\uDD50 Hits adjacent enemies \u2014 tap \u26A1 Cast Now";
+            case "TEAMTARGET"   -> "\uD83D\uDC65 Affects all allies  \u2014 tap \u26A1 Cast Now";
+            case "SELFTARGET"   -> "\uD83D\uDCCD Affects yourself    \u2014 tap \u26A1 Cast Now";
+            default             -> a.getCastArea().toString();
+        };
+        Label aimL = new Label(aimDesc);
+        aimL.setStyle("-fx-font-size: 9px; -fx-text-fill: #90b8d8;");
+        aimL.setWrapText(true);
+        aimL.setMaxWidth(190);
+
+        detailBox.getChildren().addAll(sep, whatL, aimL);
+
+        if (a.getCastRange() > 0) {
+            Label rangeL = new Label("\uD83D\uDCCF Range: " + a.getCastRange() + " cells");
+            rangeL.setStyle("-fx-font-size: 9px; -fx-text-fill: #90b8d8;");
+            detailBox.getChildren().add(rangeL);
+        }
+        if (a.getBaseCooldown() > 0) {
+            String cdText = "\u23F3 Cooldown: " + a.getBaseCooldown() + " turns";
+            if (a.onCooldown()) cdText += "  (" + a.getCurrentCooldown() + " left)";
+            Label cdInfoL = new Label(cdText);
+            cdInfoL.setStyle("-fx-font-size: 9px; -fx-text-fill: #e09060;");
+            detailBox.getChildren().add(cdInfoL);
+        }
+
+        card.getChildren().addAll(topRow, nameL, costRow, detailBox);
+
+        // ── Single click handler for ALL cards (ready or not) ──────────────────
+        card.setOnMouseClicked(e -> {
+            boolean wasExpanded = (expandedAbility == a);
+            if (ready) {
+                SoundManager.getInstance().play("select");
+                if (selectedAbility == a) {
+                    selectedAbility = null;
+                    expandedAbility = null;
+                } else {
+                    selectedAbility = a;
+                    expandedAbility = a;
+                    tbCast.setSelected(true);
+                }
+            } else {
+                // Not ready: just toggle the info panel so player knows why
+                expandedAbility = wasExpanded ? null : a;
+            }
+            refreshAbilitiesPanel();
+            refreshTurnInfo();
+            highlightCells();
+        });
+
         return card;
     }
 
@@ -687,15 +753,22 @@ public class GameBoardController {
                 AreaOfEffect aoe = selectedAbility.getCastArea();
                 if (aoe == AreaOfEffect.SINGLETARGET)   lblActionHint.setText("Click a highlighted cell to target");
                 else if (aoe == AreaOfEffect.DIRECTIONAL) lblActionHint.setText("Press direction to cast");
-                else                                      lblActionHint.setText("Press any direction to cast");
+                else                                      lblActionHint.setText("Tap \u26A1 Cast Now below, or press any direction");
             } else lblActionHint.setText("Select an ability, then cast");
+        }
+
+        // Show/hide the Cast Now button for auto-cast abilities
+        if (btnCastNow != null) {
+            boolean showCastNow = selectedAbility != null
+                    && selectedAbility.getCastArea() != AreaOfEffect.SINGLETARGET
+                    && selectedAbility.getCastArea() != AreaOfEffect.DIRECTIONAL;
+            btnCastNow.setVisible(showCastNow);
+            btnCastNow.setManaged(showCastNow);
         }
     }
 
     // Cell highlighting
     private void highlightCells() {
-        // highlights are applied inside renderBoard, but we can refresh here too
-        // Just trigger a re-render of just the highlight classes
         if (cells == null || game == null) return;
         clearHighlights();
         Champion c = game.getCurrentChampion();
@@ -720,19 +793,71 @@ public class GameBoardController {
                     if (game.getBoard()[nr][nc] != null) break;
                 }
             }
-        } else if (tbCast.isSelected() && selectedAbility != null
-                   && selectedAbility.getCastArea() == AreaOfEffect.SINGLETARGET) {
+        } else if (tbCast.isSelected() && selectedAbility != null) {
+            AreaOfEffect aoe = selectedAbility.getCastArea();
             int castRange = selectedAbility.getCastRange();
-            for (int rr = 0; rr < 5; rr++) {
-                for (int cc = 0; cc < 5; cc++) {
-                    if (game.getBoard()[rr][cc] instanceof Champion target
-                            && target.getCondition() != Condition.KNOCKEDOUT
-                            && game.isFirstTeam(c) != game.isFirstTeam(target)) {
-                        int dist = Math.abs(r - rr) + Math.abs(col - cc);
-                        if (dist <= castRange && dist > 0)
-                            cells[rr][cc].getStyleClass().add("highlight-ability");
+
+            if (aoe == AreaOfEffect.SINGLETARGET) {
+                // Highlight valid enemy targets; dim everything else
+                for (int rr = 0; rr < 5; rr++) {
+                    for (int cc = 0; cc < 5; cc++) {
+                        if (game.getBoard()[rr][cc] instanceof Champion target
+                                && target.getCondition() != Condition.KNOCKEDOUT
+                                && game.isFirstTeam(c) != game.isFirstTeam(target)) {
+                            int dist = Math.abs(r - rr) + Math.abs(col - cc);
+                            if (dist <= castRange && dist > 0) {
+                                cells[rr][cc].getStyleClass().add("highlight-ability");
+                                continue;
+                            }
+                        }
+                        // Dim all cells that are not valid targets (skip caster's own cell)
+                        if (rr != r || cc != col)
+                            cells[rr][cc].getStyleClass().add("cell-dimmed");
                     }
                 }
+            } else if (aoe == AreaOfEffect.SURROUND) {
+                // Highlight adjacent cells that have enemies; dim all others
+                int[][] adj = {{-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{1,0},{1,1}};
+                for (int rr = 0; rr < 5; rr++) {
+                    for (int cc = 0; cc < 5; cc++) {
+                        if (rr == r && cc == col) continue;
+                        boolean isAdj = Math.abs(rr - r) <= 1 && Math.abs(cc - col) <= 1;
+                        boolean hasEnemy = game.getBoard()[rr][cc] instanceof Champion t
+                                && t.getCondition() != Condition.KNOCKEDOUT
+                                && game.isFirstTeam(c) != game.isFirstTeam(t);
+                        if (isAdj && hasEnemy)
+                            cells[rr][cc].getStyleClass().add("highlight-ability");
+                        else
+                            cells[rr][cc].getStyleClass().add("cell-dimmed");
+                    }
+                }
+            } else if (aoe == AreaOfEffect.TEAMTARGET) {
+                // Highlight same-team champions; dim all others
+                for (int rr = 0; rr < 5; rr++) {
+                    for (int cc = 0; cc < 5; cc++) {
+                        if (rr == r && cc == col) continue;
+                        if (game.getBoard()[rr][cc] instanceof Champion ally
+                                && ally.getCondition() != Condition.KNOCKEDOUT
+                                && game.isFirstTeam(c) == game.isFirstTeam(ally)) {
+                            cells[rr][cc].getStyleClass().add("highlight-team");
+                        } else {
+                            cells[rr][cc].getStyleClass().add("cell-dimmed");
+                        }
+                    }
+                }
+            } else if (aoe == AreaOfEffect.SELFTARGET) {
+                // Highlight the caster's own cell; dim everything else
+                cells[r][col].getStyleClass().add("highlight-self");
+                for (int rr = 0; rr < 5; rr++)
+                    for (int cc = 0; cc < 5; cc++)
+                        if (rr != r || cc != col)
+                            cells[rr][cc].getStyleClass().add("cell-dimmed");
+            } else if (aoe == AreaOfEffect.DIRECTIONAL) {
+                // Dim all cells — direction buttons control targeting
+                for (int rr = 0; rr < 5; rr++)
+                    for (int cc = 0; cc < 5; cc++)
+                        if (rr != r || cc != col)
+                            cells[rr][cc].getStyleClass().add("cell-dimmed");
             }
         }
     }
@@ -741,7 +866,9 @@ public class GameBoardController {
         if (cells == null) return;
         for (int r = 0; r < 5; r++)
             for (int c = 0; c < 5; c++)
-                cells[r][c].getStyleClass().removeAll("highlight-move", "highlight-attack", "highlight-ability");
+                cells[r][c].getStyleClass().removeAll(
+                    "highlight-move", "highlight-attack", "highlight-ability",
+                    "highlight-self", "highlight-team", "cell-dimmed");
     }
 
     // Floating damage numbers
@@ -835,10 +962,10 @@ public class GameBoardController {
         } else if (tbCast.isSelected() && selectedAbility != null) {
             AreaOfEffect aoe = selectedAbility.getCastArea();
             if (aoe == AreaOfEffect.DIRECTIONAL) {
-                try { game.castAbility(selectedAbility, d); selectedAbility = null; refreshAll(); }
+                try { game.castAbility(selectedAbility, d); selectedAbility = null; expandedAbility = null; refreshAll(); }
                 catch (Exception e) { SoundManager.getInstance().play("error"); appendLog("\u26a0 " + e.getMessage()); }
             } else if (aoe != AreaOfEffect.SINGLETARGET) {
-                try { game.castAbility(selectedAbility); selectedAbility = null; refreshAll(); }
+                try { game.castAbility(selectedAbility); selectedAbility = null; expandedAbility = null; refreshAll(); }
                 catch (Exception e) { SoundManager.getInstance().play("error"); appendLog("\u26a0 " + e.getMessage()); }
             } else {
                 appendLog("Click a highlighted cell to target this ability.");
@@ -849,8 +976,25 @@ public class GameBoardController {
     private void onCellClicked(int row, int col) {
         if (!tbCast.isSelected() || selectedAbility == null) return;
         if (selectedAbility.getCastArea() == AreaOfEffect.SINGLETARGET) {
-            try { game.castAbility(selectedAbility, row, col); selectedAbility = null; refreshAll(); }
+            try { game.castAbility(selectedAbility, row, col); selectedAbility = null; expandedAbility = null; refreshAll(); }
             catch (Exception e) { SoundManager.getInstance().play("error"); appendLog("\u26a0 " + e.getMessage()); }
+        }
+    }
+
+    @FXML private void onCastNow() {
+        // Fires auto-cast abilities (SURROUND, TEAMTARGET, SELFTARGET) without needing direction
+        if (!tbCast.isSelected() || selectedAbility == null) return;
+        AreaOfEffect aoe = selectedAbility.getCastArea();
+        if (aoe != AreaOfEffect.SINGLETARGET && aoe != AreaOfEffect.DIRECTIONAL) {
+            try {
+                game.castAbility(selectedAbility);
+                selectedAbility = null;
+                expandedAbility = null;
+                refreshAll();
+            } catch (Exception e) {
+                SoundManager.getInstance().play("error");
+                appendLog("\u26a0 " + e.getMessage());
+            }
         }
     }
 
@@ -859,6 +1003,7 @@ public class GameBoardController {
         game.endTurn();
         turnNumber++;
         selectedAbility = null;
+        expandedAbility = null;
     }
 
     @FXML private void onLeaderAbility() {

@@ -172,6 +172,12 @@
             <!-- Ability Cards Container -->
             <VBox fx:id="abilitiesBox" spacing="8"/>
 
+            <!-- Cast Now button — visible only for auto-cast abilities (SURROUND/TEAM/SELF) -->
+            <Button fx:id="btnCastNow" text="⚡ CAST NOW"
+                    styleClass="btn-cast-now" maxWidth="Infinity"
+                    onAction="#onCastNow"
+                    visible="false" managed="false"/>
+
             <Region VBox.vgrow="ALWAYS"/>
 
             <Label text="ACTIONS" styleClass="section-title" style="-fx-font-size: 13px;"/>
