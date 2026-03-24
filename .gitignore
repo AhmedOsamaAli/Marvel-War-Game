@@ -16,6 +16,9 @@ pom.xml
 .vscode/
 *.iml
 .idea/
+.project
+.classpath
+.settings/
 
 # Logs / debug artifacts
 full_log.txt
@@ -23,6 +26,12 @@ game_stderr.txt
 game_stdout.txt
 run_log.txt
 run_log2.txt
+
+# Unused data files at root level
+Abilities.csv
+Champions.csv
+test_abilities.csv
+test_champions.csv
 
 # Raw/unprocessed images dropped during development
 images/
