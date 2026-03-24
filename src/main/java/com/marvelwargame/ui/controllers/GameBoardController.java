@@ -62,6 +62,9 @@ public class GameBoardController {
     @FXML private VBox abilitiesBox;
     @FXML private Button btnCastNow;
 
+    // Direction buttons (icons loaded programmatically to avoid jrt: URL issues)
+    @FXML private Button btnDirUp, btnDirDown, btnDirLeft, btnDirRight;
+
     // Bottom log
     @FXML private TextArea gameLog;
 
@@ -81,6 +84,12 @@ public class GameBoardController {
         lblP2Name.setText(p2.getName().toUpperCase());
         lblP1BoardName.setText("\u25b2 " + p1.getName().toUpperCase() + " \u25b2");
         lblP2BoardName.setText("\u25bc " + p2.getName().toUpperCase() + " \u25bc");
+
+        // Load direction-button icons programmatically (avoids jrt: relative-URL issues in packaged app)
+        setDirIcon(btnDirUp,    "arrowUp");
+        setDirIcon(btnDirDown,  "arrowDown");
+        setDirIcon(btnDirLeft,  "arrowLeft");
+        setDirIcon(btnDirRight, "arrowRight");
 
         subscribeToEvents();
         buildBoard();
@@ -1058,6 +1067,25 @@ public class GameBoardController {
         return "badge-antihero";
     }
     private String shortName(String name) { return name.length() > 9 ? name.substring(0, 8) + "\u2026" : name; }
+
+    private void setDirIcon(Button btn, String iconName) {
+        if (btn == null) return;
+        Image img = AssetManager.getInstance().getIcon(iconName);
+        if (img != null) {
+            ImageView iv = new ImageView(img);
+            iv.setFitWidth(22); iv.setFitHeight(22);
+            btn.setGraphic(iv);
+        } else {
+            // Fallback Unicode arrows if icon resource unavailable
+            btn.setText(switch (iconName) {
+                case "arrowUp"    -> "\u2191";
+                case "arrowDown"  -> "\u2193";
+                case "arrowLeft"  -> "\u2190";
+                case "arrowRight" -> "\u2192";
+                default -> iconName;
+            });
+        }
+    }
     private String conditionIcon(Condition c) {
         return switch (c) {
             case INACTIVE   -> "\uD83D\uDE34";

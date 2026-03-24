@@ -185,38 +185,14 @@
             <!-- Direction D-pad with icons -->
             <Label text="DIRECTION" styleClass="dim-text" style="-fx-font-size: 10px; -fx-letter-spacing: 2px;"/>
             <GridPane alignment="CENTER" hgap="5" vgap="5">
-                <Button styleClass="btn-icon" onAction="#onDirectionUp"
-                        GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="52" prefHeight="52">
-                    <graphic>
-                        <ImageView fitWidth="22" fitHeight="22" preserveRatio="true">
-                            <image><Image url="@../images/icons/arrowUp.png"/></image>
-                        </ImageView>
-                    </graphic>
-                </Button>
-                <Button styleClass="btn-icon" onAction="#onDirectionLeft"
-                        GridPane.columnIndex="0" GridPane.rowIndex="1" prefWidth="52" prefHeight="52">
-                    <graphic>
-                        <ImageView fitWidth="22" fitHeight="22" preserveRatio="true">
-                            <image><Image url="@../images/icons/arrowLeft.png"/></image>
-                        </ImageView>
-                    </graphic>
-                </Button>
-                <Button styleClass="btn-icon" onAction="#onDirectionDown"
-                        GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="52" prefHeight="52">
-                    <graphic>
-                        <ImageView fitWidth="22" fitHeight="22" preserveRatio="true">
-                            <image><Image url="@../images/icons/arrowDown.png"/></image>
-                        </ImageView>
-                    </graphic>
-                </Button>
-                <Button styleClass="btn-icon" onAction="#onDirectionRight"
-                        GridPane.columnIndex="2" GridPane.rowIndex="1" prefWidth="52" prefHeight="52">
-                    <graphic>
-                        <ImageView fitWidth="22" fitHeight="22" preserveRatio="true">
-                            <image><Image url="@../images/icons/arrowRight.png"/></image>
-                        </ImageView>
-                    </graphic>
-                </Button>
+                <Button fx:id="btnDirUp" styleClass="btn-icon" onAction="#onDirectionUp"
+                        GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="52" prefHeight="52"/>
+                <Button fx:id="btnDirLeft" styleClass="btn-icon" onAction="#onDirectionLeft"
+                        GridPane.columnIndex="0" GridPane.rowIndex="1" prefWidth="52" prefHeight="52"/>
+                <Button fx:id="btnDirDown" styleClass="btn-icon" onAction="#onDirectionDown"
+                        GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="52" prefHeight="52"/>
+                <Button fx:id="btnDirRight" styleClass="btn-icon" onAction="#onDirectionRight"
+                        GridPane.columnIndex="2" GridPane.rowIndex="1" prefWidth="52" prefHeight="52"/>
             </GridPane>
 
             <!-- Action mode tab strip (replaces radio buttons) -->
