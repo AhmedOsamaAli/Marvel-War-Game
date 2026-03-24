@@ -1,19 +1,9 @@
 package com.marvelwargame.ui.util;
 
-import javafx.geometry.VPos;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.RadialGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.SnapshotParameters;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.TextAlignment;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -128,64 +118,76 @@ public final class AssetManager {
             }
         }
 
-        // 3. Fallback: generate a portrait using JavaFX Canvas (always works, no network/files needed)
-        return generateCanvasPortrait(key);
+        // 3. Fallback: generate a portrait by painting pixels directly into a WritableImage.
+        // This uses no Canvas / snapshot / rendering pipeline — works everywhere.
+        return generatePixelPortrait(key);
     }
 
     /**
-     * Generates a champion portrait image using JavaFX Canvas.
-     * Must be called on the JavaFX Application Thread.
+     * Paints a gradient portrait directly into a WritableImage using PixelWriter.
+     * Safe to call from any thread; requires no JavaFX scene or rendering pipeline.
      */
-    private Image generateCanvasPortrait(String key) {
+    private Image generatePixelPortrait(String key) {
         try {
             Color base = Color.web(getPlaceholderColor(key));
             int W = 200, H = 250;
-            Canvas canvas = new Canvas(W, H);
-            GraphicsContext gc = canvas.getGraphicsContext2D();
+            WritableImage img = new WritableImage(W, H);
+            PixelWriter pw = img.getPixelWriter();
 
-            // Background gradient (dark at bottom, lighter at top)
-            LinearGradient bg = new LinearGradient(0, 0, 0, H, false, CycleMethod.NO_CYCLE,
-                new Stop(0.0, base.interpolate(Color.WHITE, 0.30)),
-                new Stop(1.0, base.interpolate(Color.BLACK, 0.55)));
-            gc.setFill(bg);
-            gc.fillRect(0, 0, W, H);
+            // Pre-compute top/bottom gradient stops
+            Color top    = base.interpolate(Color.WHITE, 0.30);
+            Color bottom = base.interpolate(Color.BLACK, 0.55);
 
-            // Radial highlight (light source top-left)
-            RadialGradient shine = new RadialGradient(0, 0, W * 0.30, H * 0.20, W * 0.65,
-                false, CycleMethod.NO_CYCLE,
-                new Stop(0, Color.rgb(255, 255, 255, 0.28)),
-                new Stop(1, Color.TRANSPARENT));
-            gc.setFill(shine);
-            gc.fillRect(0, 0, W, H);
+            for (int y = 0; y < H; y++) {
+                double t = (double) y / (H - 1);
+                // Vertical gradient: top → bottom
+                double r = top.getRed()   + t * (bottom.getRed()   - top.getRed());
+                double g = top.getGreen() + t * (bottom.getGreen() - top.getGreen());
+                double b = top.getBlue()  + t * (bottom.getBlue()  - top.getBlue());
 
-            // Large initial letter centered
-            String initial = key.substring(0, 1).toUpperCase();
-            gc.setFill(Color.rgb(255, 255, 255, 0.90));
-            gc.setFont(Font.font("System", FontWeight.BOLD, 120));
-            gc.setTextAlign(TextAlignment.CENTER);
-            gc.setTextBaseline(VPos.CENTER);
-            gc.fillText(initial, W / 2.0, H / 2.0 - 10);
+                // Bottom-third darkening (cinematic shadow)
+                double shadow = Math.max(0, (t - 0.6) / 0.4) * 0.50;
 
-            // Bottom shadow overlay for visual depth
-            LinearGradient bottomShadow = new LinearGradient(0, H * 0.55, 0, H, false, CycleMethod.NO_CYCLE,
-                new Stop(0, Color.TRANSPARENT),
-                new Stop(1, Color.rgb(0, 0, 0, 0.55)));
-            gc.setFill(bottomShadow);
-            gc.fillRect(0, 0, W, H);
+                for (int x = 0; x < W; x++) {
+                    // Radial highlight from top-left quadrant
+                    double dx = (double) x / W - 0.28;
+                    double dy = (double) y / H - 0.18;
+                    double dist = Math.sqrt(dx * dx + dy * dy) / 0.60;
+                    double shine = Math.max(0, 0.26 * (1.0 - dist));
 
-            // Thin colored border
-            gc.setStroke(base.brighter().brighter());
-            gc.setLineWidth(3);
-            gc.strokeRect(2, 2, W - 4, H - 4);
+                    double fr = clamp(r * (1 - shadow) + shine * (1 - r));
+                    double fg = clamp(g * (1 - shadow) + shine * (1 - g));
+                    double fb = clamp(b * (1 - shadow) + shine * (1 - b));
 
-            SnapshotParameters params = new SnapshotParameters();
-            params.setFill(Color.TRANSPARENT);
-            WritableImage snapshot = new WritableImage(W, H);
-            canvas.snapshot(params, snapshot);
-            return snapshot;
+                    pw.setArgb(x, y, toArgb(1.0, fr, fg, fb));
+                }
+            }
+
+            // 2-pixel colored border
+            Color border = base.brighter().brighter();
+            for (int x = 0; x < W; x++) {
+                pw.setArgb(x, 0,   toArgb(1, border.getRed(), border.getGreen(), border.getBlue()));
+                pw.setArgb(x, 1,   toArgb(1, border.getRed(), border.getGreen(), border.getBlue()));
+                pw.setArgb(x, H-2, toArgb(1, border.getRed(), border.getGreen(), border.getBlue()));
+                pw.setArgb(x, H-1, toArgb(1, border.getRed(), border.getGreen(), border.getBlue()));
+            }
+            for (int y = 0; y < H; y++) {
+                pw.setArgb(0,   y, toArgb(1, border.getRed(), border.getGreen(), border.getBlue()));
+                pw.setArgb(1,   y, toArgb(1, border.getRed(), border.getGreen(), border.getBlue()));
+                pw.setArgb(W-2, y, toArgb(1, border.getRed(), border.getGreen(), border.getBlue()));
+                pw.setArgb(W-1, y, toArgb(1, border.getRed(), border.getGreen(), border.getBlue()));
+            }
+
+            return img;
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private static double clamp(double v) { return v < 0 ? 0 : (v > 1 ? 1 : v); }
+
+    private static int toArgb(double a, double r, double g, double b) {
+        return ((int)(a * 255) << 24) | ((int)(r * 255) << 16) | ((int)(g * 255) << 8) | (int)(b * 255);
     }
 
     /** Returns the hex color code associated with a champion for placeholder backgrounds. */
