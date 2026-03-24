@@ -5,12 +5,17 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Singleton that provides champion portrait images.
- * Load order: (1) bundled resource, (2) online URL, (3) canvas-generated portrait.
+ * Load order:
+ *   1. Filesystem path relative to the exe (jpackage: images land in app/ dir)
+ *   2. ClassLoader classpath lookup (gradlew run / IDE)
+ *   3. Pixel-painted WritableImage fallback (always works)
  */
 public final class AssetManager {
 
@@ -43,42 +48,73 @@ public final class AssetManager {
 
     /**
      * Returns the portrait Image for a champion. Never returns null – falls back to
-     * a canvas-generated colored tile with the champion's initial.
+     * a pixel-painted gradient tile.
      */
     public Image getPortrait(String championName) {
         String key = championName.toLowerCase();
         return cache.computeIfAbsent(key, this::loadImage);
     }
 
+    /**
+     * Finds the directory that contains the running exe (jpackage context).
+     * In jpackage, java.class.path contains entries under the app/ directory.
+     * Returns null when running via gradlew / IDE.
+     */
+    private static Path detectAppDir() {
+        try {
+            // In jpackage the exe sets jpackage.app-version; confirm we're packaged
+            if (System.getProperty("jpackage.app-version") == null) return null;
+            // java.class.path in jpackage lists the app/-relative jars, e.g.
+            // C:\MarvelWarGame\app\vorbisspi-1.0.3.3.jar
+            String cp = System.getProperty("java.class.path", "");
+            for (String entry : cp.split(java.io.File.pathSeparator)) {
+                Path p = Path.of(entry);
+                if (Files.exists(p)) return p.getParent(); // that's the app/ dir
+            }
+        } catch (Exception ignored) {}
+        return null;
+    }
+
+    private static final Path APP_DIR = detectAppDir();
+
     private Image loadImage(String key) {
-        // ClassLoader.getResourceAsStream bypasses JPMS module encapsulation entirely.
-        // This is the only API guaranteed to work in both gradlew run AND jpackage JIMAGE.
-        // (Class.getResourceAsStream and Module.getResourceAsStream can fail in named
-        //  modules when the resource path maps to a package not declared open.)
-        ClassLoader cl = AssetManager.class.getClassLoader();
         String base = "images/champions/" + key.replace(" ", "_");
-        for (String ext : new String[]{".png", ".jpg", ".jpeg"}) {
-            try (InputStream res = cl.getResourceAsStream(base + ext)) {
-                if (res != null) {
-                    byte[] bytes = res.readAllBytes();
-                    return new Image(new java.io.ByteArrayInputStream(bytes));
+
+        // 1. Filesystem lookup — works in jpackage where images are copied to app/images/
+        if (APP_DIR != null) {
+            for (String ext : new String[]{".png", ".jpg", ".jpeg"}) {
+                Path file = APP_DIR.resolve(base + ext);
+                if (Files.exists(file)) {
+                    try { return new Image(file.toUri().toString()); }
+                    catch (Exception ignored) {}
                 }
-            } catch (Exception e) { /* try next ext */ }
+            }
         }
 
-        // Fallback: generate a gradient portrait via PixelWriter (no files, no network needed).
+        // 2. ClassLoader classpath lookup — works in gradlew run / IDE
+        ClassLoader cl = AssetManager.class.getClassLoader();
+        for (String ext : new String[]{".png", ".jpg", ".jpeg"}) {
+            try (InputStream s = cl.getResourceAsStream(base + ext)) {
+                if (s != null) {
+                    byte[] b = s.readAllBytes();
+                    return new Image(new java.io.ByteArrayInputStream(b));
+                }
+            } catch (Exception ignored) {}
+        }
+
+        // 3. Pixel-painted gradient — always works, no files needed
         return generatePixelPortrait(key);
     }
 
     /**
      * Paints a gradient portrait directly into a WritableImage using PixelWriter.
-     * Safe to call from any thread; requires no JavaFX scene or rendering pipeline.
      */
     private Image generatePixelPortrait(String key) {
         try {
             Color base = Color.web(getPlaceholderColor(key));
             int W = 200, H = 250;
             WritableImage img = new WritableImage(W, H);
+            System.err.println("[AssetManager] generatePixelPortrait key=" + key + " img=" + img + " isError=" + img.isError());
             PixelWriter pw = img.getPixelWriter();
 
             // Pre-compute top/bottom gradient stops
@@ -127,6 +163,7 @@ public final class AssetManager {
 
             return img;
         } catch (Exception e) {
+            System.err.println("[AssetManager] generatePixelPortrait EXCEPTION for " + key + ": " + e);
             return null;
         }
     }
@@ -146,8 +183,16 @@ public final class AssetManager {
     public Image getIcon(String name) {
         return cache.computeIfAbsent("icon:" + name, k -> {
             String path = "images/icons/" + name + ".png";
-            ClassLoader cl = AssetManager.class.getClassLoader();
-            try (InputStream res = cl.getResourceAsStream(path)) {
+            // 1. Filesystem (jpackage)
+            if (APP_DIR != null) {
+                Path file = APP_DIR.resolve(path);
+                if (Files.exists(file)) {
+                    try { return new Image(file.toUri().toString()); }
+                    catch (Exception ignored) {}
+                }
+            }
+            // 2. ClassLoader classpath (gradlew run / IDE)
+            try (InputStream res = AssetManager.class.getClassLoader().getResourceAsStream(path)) {
                 if (res == null) return null;
                 byte[] bytes = res.readAllBytes();
                 return new Image(new java.io.ByteArrayInputStream(bytes));

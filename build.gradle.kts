@@ -80,6 +80,21 @@ tasks.register("jpackageImage") {
 
         classpathJars.forEach { it.copyTo(inputDir.resolve(it.name), overwrite = true) }
 
+        // Copy image resources to inputDir so they land as real filesystem files in app/images/
+        // This bypasses JDK 24 jlink JIMAGE encapsulation that blocks ClassLoader resource lookup
+        val srcImages = projectDir.resolve("src/main/resources/images")
+        if (srcImages.exists()) {
+            srcImages.walkTopDown().forEach { f ->
+                if (f.isFile) {
+                    val rel = f.relativeTo(srcImages)
+                    val dest = inputDir.resolve("images/${rel.path.replace("\\", "/")}")
+                    dest.parentFile.mkdirs()
+                    f.copyTo(dest, overwrite = true)
+                }
+            }
+            println("Copied images/ to inputDir")
+        }
+
         val modulePath = (javafxJars + appJar)
             .joinToString(File.pathSeparator) { it.absolutePath }
 
