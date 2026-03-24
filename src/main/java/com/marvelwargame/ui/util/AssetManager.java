@@ -1,13 +1,26 @@
 package com.marvelwargame.ui.util;
 
+import javafx.geometry.VPos;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.RadialGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Singleton that provides champion portrait images.
- * Load order: (1) bundled resource, (2) online URL, (3) colored placeholder.
+ * Load order: (1) bundled resource, (2) online URL, (3) canvas-generated portrait.
  */
 public final class AssetManager {
 
@@ -115,8 +128,64 @@ public final class AssetManager {
             }
         }
 
-        // 3. Return null – controllers will render a CSS-styled placeholder label
-        return null;
+        // 3. Fallback: generate a portrait using JavaFX Canvas (always works, no network/files needed)
+        return generateCanvasPortrait(key);
+    }
+
+    /**
+     * Generates a champion portrait image using JavaFX Canvas.
+     * Must be called on the JavaFX Application Thread.
+     */
+    private Image generateCanvasPortrait(String key) {
+        try {
+            Color base = Color.web(getPlaceholderColor(key));
+            int W = 200, H = 250;
+            Canvas canvas = new Canvas(W, H);
+            GraphicsContext gc = canvas.getGraphicsContext2D();
+
+            // Background gradient (dark at bottom, lighter at top)
+            LinearGradient bg = new LinearGradient(0, 0, 0, H, false, CycleMethod.NO_CYCLE,
+                new Stop(0.0, base.interpolate(Color.WHITE, 0.30)),
+                new Stop(1.0, base.interpolate(Color.BLACK, 0.55)));
+            gc.setFill(bg);
+            gc.fillRect(0, 0, W, H);
+
+            // Radial highlight (light source top-left)
+            RadialGradient shine = new RadialGradient(0, 0, W * 0.30, H * 0.20, W * 0.65,
+                false, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.rgb(255, 255, 255, 0.28)),
+                new Stop(1, Color.TRANSPARENT));
+            gc.setFill(shine);
+            gc.fillRect(0, 0, W, H);
+
+            // Large initial letter centered
+            String initial = key.substring(0, 1).toUpperCase();
+            gc.setFill(Color.rgb(255, 255, 255, 0.90));
+            gc.setFont(Font.font("System", FontWeight.BOLD, 120));
+            gc.setTextAlign(TextAlignment.CENTER);
+            gc.setTextBaseline(VPos.CENTER);
+            gc.fillText(initial, W / 2.0, H / 2.0 - 10);
+
+            // Bottom shadow overlay for visual depth
+            LinearGradient bottomShadow = new LinearGradient(0, H * 0.55, 0, H, false, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.TRANSPARENT),
+                new Stop(1, Color.rgb(0, 0, 0, 0.55)));
+            gc.setFill(bottomShadow);
+            gc.fillRect(0, 0, W, H);
+
+            // Thin colored border
+            gc.setStroke(base.brighter().brighter());
+            gc.setLineWidth(3);
+            gc.strokeRect(2, 2, W - 4, H - 4);
+
+            SnapshotParameters params = new SnapshotParameters();
+            params.setFill(Color.TRANSPARENT);
+            WritableImage snapshot = new WritableImage(W, H);
+            canvas.snapshot(params, snapshot);
+            return snapshot;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /** Returns the hex color code associated with a champion for placeholder backgrounds. */
